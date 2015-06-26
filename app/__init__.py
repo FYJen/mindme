@@ -12,3 +12,6 @@ mindme_api.config.from_object(API_CONFIG_FILE)
 
 # DB configuration.
 db = SQLAlchemy(mindme_api)
+
+from app import views
+from dbmodels import models
