@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from app import db
 from base import API_Base
+from config import time_format
 from dbmodels import models
-from datetime import datetime
 from lib import status as custome_status
 
 
@@ -113,6 +115,7 @@ class Reminder(API_Base):
 
         # Update status
         message_obj.status = status_obj
+        message_obj.last_modified_date = datetime.now()
         db.session.commit()
 
         return cls._to_Dict(message_obj, deref_all)
@@ -125,9 +128,9 @@ class Reminder(API_Base):
             'id': message.id,
             'message': message.message,
             'status': message.status.name,
-            'created_date': message.created_date.strftime("%Y-%m-%d"),
+            'created_date': message.created_date.strftime(time_format),
             'last_modified_date':
-                message.last_modified_date.strftime("%Y-%m-%d")
+                message.last_modified_date.strftime(time_format)
         }
 
         if deref_all:
