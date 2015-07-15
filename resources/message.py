@@ -1,26 +1,27 @@
+from base import API_Base
 from dbmodels import models
 from lib import status
 
 
-class Reminder(object):
+class Reminder(API_Base):
     """
     """
 
     @classmethod
-    def get(cls, reminder_id, deref_all=True):
+    def get(cls, reminder_id, deref_all=True, *args, **kwargs):
         """
         """
         message = models.Message.query.get(reminder_id)
 
         if not message:
             raise status.ResourceNotFound(
-                msg='No message found with the given id - %s' % reminder_id
+                details='No message found with the given id - %s' % reminder_id
             )
 
         return [cls._to_Dict(msg, deref_all) for msg in [message]]
 
     @classmethod
-    def _to_Dict(cls, message, deref_all):
+    def _to_Dict(cls, message, deref_all, *args, **kwargs):
         reminder_dict = {
             'id': message.id,
             'message': message.message,
