@@ -40,4 +40,17 @@ def reminder_create():
 
 @mindme_api.route('/api/v1/reminder/update/', methods=['POST'])
 def reminder_update():
-    return 'reminder_update'
+    query_args = {
+        'message_id': request.args.get('message_id', None),
+        'new_status': request.args.get('new_status', '')
+    }
+
+    try:
+        message = Reminder.update(**query_args)
+        result = status.HTTPOk(result=message)
+    except status.CustomStatus as e:
+        result = e
+    except Exception:
+        result = status.InternalServerError()
+
+    return json.dumps(result.toDict())
