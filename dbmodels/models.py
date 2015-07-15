@@ -13,6 +13,9 @@ class ReceivedMessage(db.Model):
         nullable=False
     )
 
+    def __repr__(self):
+        return '<ReceivedMessage> %r' % self.id
+
 
 class SentMessage(db.Model):
     """
@@ -25,6 +28,9 @@ class SentMessage(db.Model):
         db.ForeignKey('message.id'),
         nullable=False
     )
+
+    def __repr__(self):
+        return '<SentMessage> %r' % self.id
 
 
 class Message(db.Model):
@@ -51,6 +57,9 @@ class Message(db.Model):
         uselist=False
     )
 
+    def __repr__(self):
+        return '<Message> %r' % self.id
+
 
 class Status(db.Model):
     """
@@ -64,6 +73,9 @@ class Status(db.Model):
         backref='status',
         lazy='dynamic'
     )
+
+    def __repr__(self):
+        return '<Status> %r' % self.id
 
 
 class User(db.Model):
@@ -84,3 +96,6 @@ class User(db.Model):
         backref='author',
         lazy='dynamic'
     )
+
+    def __repr__(self):
+        return '<User> %r - %r' % (self.id, self.fb_id)
