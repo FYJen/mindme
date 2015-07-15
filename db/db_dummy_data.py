@@ -36,25 +36,29 @@ MESSAGE = {
     'msg_1': {
         'id': 1,
         'message': 'Bring my $10, thanks',
-        'date': datetime.now(),
+        'created_date': datetime.now(),
+        'last_modified_date': datetime.now(),
         'status_id': 1
     },
     'msg_2': {
         'id': 2,
         'message': 'Bring my $20, thanks',
-        'date': datetime.now(),
+        'created_date': datetime.now(),
+        'last_modified_date': datetime.now(),
         'status_id': 2
     },
     'msg_3': {
         'id': 3,
         'message': 'Bring my $30, thanks',
-        'date': datetime.now(),
+        'created_date': datetime.now(),
+        'last_modified_date': datetime.now(),
         'status_id': 3
     },
     'msg_4': {
         'id': 4,
         'message': 'Bring my $40, thanks',
-        'date': datetime.now(),
+        'created_date': datetime.now(),
+        'last_modified_date': datetime.now(),
         'status_id': 4
     }
 }

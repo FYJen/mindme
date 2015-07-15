@@ -39,7 +39,8 @@ class Message(db.Model):
     __tablename__ = 'message'
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime)
+    created_date = db.Column(db.DateTime)
+    last_modified_date = db.Column(db.DateTime)
     status_id = db.Column(
         db.Integer,
         db.ForeignKey('status.id'),
