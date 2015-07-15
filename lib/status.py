@@ -1,10 +1,19 @@
 """Custom Status.
 """
+STATUS_TO_CODE = {
+    'HTTPOk': 200,
+    'ResourceNotFound': 404,
+    'InvalidRequest': 400,
+    'InternalServerError': 500
+}
+
+
 class CustomStatus(Exception):
     """
     """
     def __init__(self, msg=None, details={}, result={}):
-        self.statusCode = self.__class__.__name__
+        self.statusCode = STATUS_TO_CODE[self.__class__.__name__]
+        self.statusName = self.__class__.__name__
         self.statusMsg = msg
         self.statusDetails = details
         self.result = result
@@ -19,17 +28,21 @@ class CustomStatus(Exception):
             }
         }
 
+
 class HTTPOk(CustomStatus):
     def __init__(self, msg='OK', **kwargs):
         CustomStatus.__init__(self, msg=msg, **kwargs)
+
 
 class ResourceNotFound(CustomStatus):
     def __init__(self, msg='Resource not found', **kwargs):
         CustomStatus.__init__(self, msg=msg, **kwargs)
 
+
 class InvalidRequest(CustomStatus):
     def __init__(self, msg='Inavlid request', **kwargs):
         CustomStatus.__init__(self, msg=msg, **kwargs)
+
 
 class InternalServerError(CustomStatus):
     def __init__(self, msg='Internal server error', **kwargs):
