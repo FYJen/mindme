@@ -21,7 +21,20 @@ def reminder_get(reminder_id):
 
 @mindme_api.route('/api/v1/reminder/create', methods=['POST'])
 def reminder_create():
-    return 'reminder_create'
+    # TODO(ajen): Remove testing and update it with actual code.
+    try:
+        message = Reminder.create(
+            'Testing reminder create with dummy data',
+            'some_fb_id_2',
+            'some_fb_id_1'
+        )
+        result = status.HTTPOk(result=message)
+    except status.CustomStatus as e:
+        result = e
+    # except Exception:
+    #     result = status.InternalServerError()
+
+    return json.dumps(result.toDict())
 
 
 @mindme_api.route('/api/v1/reminder/update', methods=['POST'])
