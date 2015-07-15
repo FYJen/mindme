@@ -31,8 +31,8 @@ def reminder_create():
         result = status.HTTPOk(result=message)
     except status.CustomStatus as e:
         result = e
-    # except Exception:
-    #     result = status.InternalServerError()
+    except Exception:
+        result = status.InternalServerError()
 
     return json.dumps(result.toDict())
 
