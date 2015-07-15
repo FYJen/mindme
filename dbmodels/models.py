@@ -4,7 +4,7 @@ from app import db
 class ReceivedMessage(db.Model):
     """
     """
-    __tableame__ = 'received_message'
+    __tablename__ = 'received_message'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message_id = db.Column(
@@ -17,7 +17,7 @@ class ReceivedMessage(db.Model):
 class SentMessage(db.Model):
     """
     """
-    __tableame__ = 'sent_message'
+    __tablename__ = 'sent_message'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message_id = db.Column(
@@ -30,7 +30,8 @@ class SentMessage(db.Model):
 class Message(db.Model):
     """
     """
-    __tableame__ = 'message'
+    __tablename__ = 'message'
+    id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime)
     status_id = db.Column(
@@ -54,7 +55,7 @@ class Message(db.Model):
 class Status(db.Model):
     """
     """
-    __tableame__ = 'status'
+    __tablename__ = 'status'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
 
@@ -68,7 +69,7 @@ class Status(db.Model):
 class User(db.Model):
     """
     """
-    __tableame__ = 'user'
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     fb_id = db.Column(db.String(64), nullable=False, index=True, unique=True)
     gcm_id = db.Column(db.String(128), nullable=False, unique=True)
