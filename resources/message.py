@@ -32,14 +32,6 @@ class Reminder(API_Base):
 
     @classmethod
     def create(cls, text, author_fb_id, assignee_fb_id):
-        # TODO(ajen): Update status_id.
-        message = models.Message(
-            message=text,
-            date=datetime.now(),
-            status_id=3
-        )
-        db.session.add(message)
-
         assignee = models.User.query.filter_by(fb_id=assignee_fb_id).first()
         if not assignee:
             raise status.ResourceNotFound(
@@ -47,10 +39,18 @@ class Reminder(API_Base):
             )
 
         author = models.User.query.filter_by(fb_id=author_fb_id).first()
-        if not assignee:
+        if not author:
             raise status.ResourceNotFound(
-                details='Given author_fb_id %s is not found.' % assignee_fb_id
+                details='Given author_fb_id (%s) is not found.' % author_fb_id
             )
+
+        # TODO(ajen): Update status_id.
+        message = models.Message(
+            message=text,
+            date=datetime.now(),
+            status_id=3
+        )
+        db.session.add(message)
 
         rcv_user_mapping = models.ReceivedMessage(
             user_id=assignee.id,
