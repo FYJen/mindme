@@ -8,6 +8,7 @@ from db_config import SQLALCHEMY_DATABASE_URI
 from db_config import SQLALCHEMY_MIGRATE_REPO
 from app import db
 
+
 def _creatDB(dryrun):
     db.create_all()
     if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
@@ -16,10 +17,11 @@ def _creatDB(dryrun):
     else:
         api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
 
+
 def _generateMigrationScript(dryrun):
     newVersion = findMaxAvailableVersion() + 1
-    migration = SQLALCHEMY_MIGRATE_REPO + \
-                '/versions/%03d_migration.py' % (newVersion)
+    migration = \
+        SQLALCHEMY_MIGRATE_REPO + '/versions/%03d_migration.py' % (newVersion)
     tmp_module = imp.new_module('old_model')
     old_model = api.create_model(SQLALCHEMY_DATABASE_URI,
                                  SQLALCHEMY_MIGRATE_REPO)
@@ -42,6 +44,7 @@ def _generateMigrationScript(dryrun):
         print '\nNew migration script will be:\n"\n%s"' % str(script)
         print '\nNew database version will be: ' + str(newVersion)
 
+
 def _upgradeDB(expectedVersion, dryrun):
     if not dryrun:
         api.upgrade(SQLALCHEMY_DATABASE_URI,
@@ -57,6 +60,7 @@ def _upgradeDB(expectedVersion, dryrun):
         print 'Dryrun:'
         print '\tNew database version will be: ' + str(expectedVersion)
 
+
 def _downgradeDB(expectedVersion, dryrun):
     if not dryrun:
         api.downgrade(SQLALCHEMY_DATABASE_URI,
@@ -64,12 +68,12 @@ def _downgradeDB(expectedVersion, dryrun):
                       expectedVersion)
 
     print 'Current database version: ' + \
-        str(
-            api.db_version(SQLALCHEMY_DATABASE_URI,SQLALCHEMY_MIGRATE_REPO)
-        )
+        str(api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO))
+
     if dryrun:
         print 'Dryrun'
         print '\tNew database version will be: ' + str(expectedVersion)
+
 
 def findMaxAvailableVersion():
     migrationDir = os.path.join(SQLALCHEMY_MIGRATE_REPO, 'versions')
@@ -88,9 +92,14 @@ def findMaxAvailableVersion():
     else:
         return 0
 
+
 def hasValidDBVersion(action, expectedVersion):
     maxAvailableVersion = findMaxAvailableVersion()
-    curVision = api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
+    curVision = api.db_version(
+        SQLALCHEMY_DATABASE_URI,
+        SQLALCHEMY_MIGRATE_REPO
+    )
+
     if action == 'upgrade' and expectedVersion < curVision:
         return False
 
@@ -101,6 +110,7 @@ def hasValidDBVersion(action, expectedVersion):
         return False
 
     return True
+
 
 def _getCommandLineOptions():
     """Get the options from the command line.
@@ -115,14 +125,14 @@ def _getCommandLineOptions():
                         choices=['create', 'upgrade', 'downgrade', 'generate'],
                         help='Action to preform on a database.')
     parser.add_argument('--db-version', default=-1,
-                        help='Desired database version to upgrade/downgrade' \
-                             'to. If none specified, it will upgrade to latest ' \
-                             'or downgrade by 1. The version specified should ' \
-                             'be between 1 and maximum available version. If ' \
-                             'upgrade is the action, ',
+                        help='Desired database version to upgrade/downgrade'
+                             'to. If none specified, it will upgrade to latest '
+                             'or downgrade by 1. The version specified should '
+                             'be between 1 and maximum available version. If '
+                             'upgrade is the action.',
                         type=int)
     parser.add_argument('--execute', dest='dryrun', action='store_false',
-                        help='If passed, this will run the actual command, ' \
+                        help='If passed, this will run the actual command, '
                              'otherwise a dry run happens.')
 
     opts = parser.parse_args()
@@ -130,11 +140,12 @@ def _getCommandLineOptions():
     if opts.db_version != -1 and not \
             hasValidDBVersion(opts.action, opts.db_version):
         parser.print_help()
-        print '\nERROR: Invalid DB version. Please make sure the specified DB' \
-              ' version is correct.'
+        print '\nERROR: Invalid DB version. Please make sure the specified ' \
+              'DB version is correct.'
         return None
     else:
         return opts
+
 
 def main():
     args = _getCommandLineOptions()
@@ -142,7 +153,7 @@ def main():
     if not args:
         return -1
 
-    if args.action =='create':
+    if args.action == 'create':
         _creatDB(args.dryrun)
     elif args.action == 'upgrade':
         if args.db_version == -1:
@@ -152,8 +163,10 @@ def main():
             _upgradeDB(args.db_version, args.dryrun)
     elif args.action == 'downgrade':
         if args.db_version == -1:
-            newVersion = api.db_version(SQLALCHEMY_DATABASE_URI,
-                                       SQLALCHEMY_MIGRATE_REPO) - 1
+            newVersion = api.db_version(
+                SQLALCHEMY_DATABASE_URI,
+                SQLALCHEMY_MIGRATE_REPO
+            ) - 1
             _downgradeDB(newVersion, args.dryrun)
         else:
             _downgradeDB(args.db_version, args.dryrun)
