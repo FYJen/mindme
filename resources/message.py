@@ -5,6 +5,9 @@ from datetime import datetime
 from lib import status
 
 
+ACTIVE_STATUS = models.Status.query.filter_by(name='active').first()
+
+
 def truncate_str(input_str, length=24, replace=' ...'):
     replace_len = len(replace)
     truncated_str = input_str[:length] + replace \
@@ -31,45 +34,61 @@ class Reminder(API_Base):
         return [cls._to_Dict(msg, deref_all) for msg in [message]]
 
     @classmethod
-    def create(cls, text, author_fb_id, assignee_fb_id):
-        assignee = models.User.query.filter_by(fb_id=assignee_fb_id).first()
+    def create(cls, message='', author_id=None, assignee_id=None):
+        """
+        """
+        # Make sure we have all the parameter we want.
+        if not all([message, author_id, assignee_id]):
+            raise status.InvalidRequest(
+                details='Bad request. Missing message, authro_id or '
+                        'assignee_id'
+            )
+
+        # Get user id for assignee by using its fb id.
+        assignee = models.User.query.filter_by(fb_id=assignee_id).first()
         if not assignee:
             raise status.ResourceNotFound(
-                details='Given assignee_fb_id %s is not found.' % assignee_fb_id
+                details='Given assignee_id (%s) is not found.' % assignee_id
             )
 
-        author = models.User.query.filter_by(fb_id=author_fb_id).first()
+        # Get user id for author by using its fb id.
+        author = models.User.query.filter_by(fb_id=author_id).first()
         if not author:
             raise status.ResourceNotFound(
-                details='Given author_fb_id (%s) is not found.' % author_fb_id
+                details='Given author_id (%s) is not found.' % author_id
             )
 
-        # TODO(ajen): Update status_id.
-        message = models.Message(
-            message=text,
+        # Create message.
+        message_obj = models.Message(
+            message=message,
             date=datetime.now(),
-            status_id=3
+            status_id=ACTIVE_STATUS.id
         )
-        db.session.add(message)
+        db.session.add(message_obj)
 
+        # Create receiver and message mapping.
         rcv_user_mapping = models.ReceivedMessage(
             user_id=assignee.id,
-            message=message,
+            message=message_obj,
         )
         db.session.add(rcv_user_mapping)
 
+        # Create sender and message mapping.
         sent_user_mapping = models.SentMessage(
             user_id=author.id,
-            message=message,
+            message=message_obj,
         )
         db.session.add(sent_user_mapping)
 
+        # Add them to database.
         db.session.commit()
 
-        return 'Reminder - "%s" created' % truncate_str(text)
+        return 'Reminder - "%s" created' % truncate_str(message)
 
     @classmethod
     def _to_Dict(cls, message, deref_all, *args, **kwargs):
+        """
+        """
         reminder_dict = {
             'id': message.id,
             'message': message.message,
