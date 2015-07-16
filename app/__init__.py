@@ -1,4 +1,5 @@
 import os
+import redis
 
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -12,6 +13,9 @@ mindme_api.config.from_object(API_CONFIG_FILE)
 
 # DB configuration.
 db = SQLAlchemy(mindme_api)
+
+# Redis store
+redis_store = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 from app import views
 from dbmodels import models
