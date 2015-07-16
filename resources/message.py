@@ -89,6 +89,8 @@ class Reminder(API_Base):
         # Add them to database.
         db.session.commit()
 
+        # TODO(ajen): Add GCM integration.
+
         return cls._to_Dict(message_obj, deref_all)
 
     @classmethod
@@ -127,6 +129,8 @@ class Reminder(API_Base):
 
         message_obj.last_modified_date = datetime.now()
         db.session.commit()
+
+        # TODO(ajen): Add GCM integration.
 
         return cls._to_Dict(message_obj, deref_all)
 

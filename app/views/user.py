@@ -15,8 +15,8 @@ def user_get(user_id):
         result = custom_status.HTTPOk(result=user)
     except custom_status.CustomStatus as e:
         result = e
-    # except Exception:
-    #     result = custom_status.InternalServerError()
+    except Exception:
+        result = custom_status.InternalServerError()
 
     return json.dumps(result.toDict())
 
