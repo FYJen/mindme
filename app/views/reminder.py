@@ -2,7 +2,7 @@ import json
 from flask import request
 
 from app import mindme_api
-from lib import status
+from lib import status as custom_status
 from resources import Reminder
 
 
@@ -10,11 +10,11 @@ from resources import Reminder
 def reminder_get(reminder_id):
     try:
         message = Reminder.get(reminder_id)
-        result = status.HTTPOk(result=message)
-    except status.CustomStatus as e:
+        result = custom_status.HTTPOk(result=message)
+    except custom_status.CustomStatus as e:
         result = e
     except Exception:
-        result = status.InternalServerError()
+        result = custom_status.InternalServerError()
 
     return json.dumps(result.toDict())
 
@@ -29,11 +29,11 @@ def reminder_create():
 
     try:
         message = Reminder.create(**query_args)
-        result = status.HTTPOk(result=message)
-    except status.CustomStatus as e:
+        result = custom_status.HTTPOk(result=message)
+    except custom_status.CustomStatus as e:
         result = e
     except Exception:
-        result = status.InternalServerError()
+        result = custom_status.InternalServerError()
 
     return json.dumps(result.toDict())
 
@@ -42,15 +42,16 @@ def reminder_create():
 def reminder_update():
     query_args = {
         'message_id': request.args.get('message_id', None),
-        'new_status': request.args.get('new_status', '')
+        'new_status': request.args.get('new_status', ''),
+        'message': request.args.get('message', '')
     }
 
     try:
         message = Reminder.update(**query_args)
-        result = status.HTTPOk(result=message)
-    except status.CustomStatus as e:
+        result = custom_status.HTTPOk(result=message)
+    except custom_status.CustomStatus as e:
         result = e
     except Exception:
-        result = status.InternalServerError()
+        result = custom_status.InternalServerError()
 
     return json.dumps(result.toDict())
