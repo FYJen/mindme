@@ -27,7 +27,7 @@ class User(API_Base):
         user_obj = models.User(fb_id=fb_id, gcm_id=gcm_id)
 
         db.session.add(user_obj)
-        db.session.commt()
+        db.session.commit()
 
         return user_obj
 
@@ -77,15 +77,14 @@ class User(API_Base):
     def _to_Dict(cls, user, deref_all, *args, **kwargs):
         """
         """
-        # Note: we do not return user's gcm_id.
         user_dict = {
             'id': user.id,
-            'fb_id': user.fb_id,
-            'gcm_id': user.gcm_id
+            'fb_id': user.fb_id
         }
 
         if deref_all:
             user_dict.update({
+                'gcm_id': user.gcm_id,
                 'received_messages': [
                     Reminder._to_Dict(msg.message, deref_all)
                     for msg in user.rcv_messages
