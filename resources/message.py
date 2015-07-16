@@ -67,7 +67,8 @@ class Reminder(API_Base):
         ACTIVE_STATUS = models.Status.query.filter_by(name='active').first()
         message_obj = models.Message(
             message=message,
-            date=datetime.now(),
+            created_date=datetime.now(),
+            last_modified_date=datetime.now(),
             status_id=ACTIVE_STATUS.id
         )
         db.session.add(message_obj)
