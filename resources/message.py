@@ -30,7 +30,7 @@ class Reminder(API_Base):
                 details='No message found with the given id - %s' % reminder_id
             )
 
-        return [cls._to_Dict(msg, deref_all) for msg in [message]]
+        return cls._to_Dict(message, deref_all)
 
     @classmethod
     def create(
@@ -92,19 +92,18 @@ class Reminder(API_Base):
         return cls._to_Dict(message_obj, deref_all)
 
     @classmethod
-    def update(cls, message_id=None, new_status='', deref_all=False):
+    def update(
+        cls,
+        message_id=None,
+        new_status='',
+        message='',
+        deref_all=False
+    ):
         """
         """
-        if not all([message_id, new_status]):
+        if not all([message_id, any([message, new_status])]):
             raise custome_status.InvalidRequest(
                 details='Bad request: Missing message_id or new_status'
-            )
-
-        status_obj = models.Status.query.filter_by(name=new_status).first()
-        if not status_obj:
-            raise custome_status.ResourceNotFound(
-                details='Given new status (%s) is not a valid '
-                        'status' % new_status
             )
 
         message_obj = models.Message.query.get(message_id)
@@ -113,8 +112,19 @@ class Reminder(API_Base):
                 details='Given message id (%s) is not found' % str(message_id)
             )
 
-        # Update status
-        message_obj.status = status_obj
+        # Update message in database.
+        if new_status:
+            status_obj = models.Status.query.filter_by(name=new_status).first()
+            if not status_obj:
+                raise custome_status.ResourceNotFound(
+                    details='Given new status (%s) is not a valid '
+                            'status' % new_status
+                )
+            message_obj.status = status_obj
+
+        if message:
+            message_obj.message = message
+
         message_obj.last_modified_date = datetime.now()
         db.session.commit()
 
