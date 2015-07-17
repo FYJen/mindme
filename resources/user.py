@@ -1,4 +1,5 @@
 from app import db
+from app import redis_store
 from base import API_Base
 from dbmodels import models
 from lib import status as custome_status
@@ -42,7 +43,7 @@ class User(API_Base):
     ):
         """
         """
-        if not all([token, fb_id, gcm_id]):
+        if not all([token, fb_id, gcm_id, expiration]):
             raise custome_status.InvalidRequest(
                 details='Bad request: Missing token or fb_id'
             )
@@ -55,23 +56,30 @@ class User(API_Base):
         if not user_obj:
             user_obj = cls._create(fb_id, gcm_id)
 
-        # TODO(ajen):
-        #   1. If user is not in redis, add token to redis.
-        #   2. Set expiration time on the cache.
+        # Set token in redis. Override it as we don't care.
+        redis_store.setex(token, expiration, user_obj.fb_id)
+
         return cls._to_Dict(user_obj, deref_all)
 
     @classmethod
-    def logout(cls, token):
+    def logout(cls, token='', fb_id=''):
         """
         """
-        if not token:
+        if not all([token, fb_id]):
             raise custome_status.InvalidRequest(
-                details='Bad request: Missing token'
+                details='Bad request: Missing token or fb_id'
             )
 
-        # TODO(ajen):
-        #   1. If user is in redis, invalidate the cache.
-        pass
+        # Invalidate the user token.
+        stored_fb_id = redis_store.get(token)
+        if not stored_fb_id or fb_id != stored_fb_id:
+            raise custome_status.InvalidRequest(
+                details='Bad request: Invalidate token'
+            )
+
+        redis_store.delete(token)
+
+        return {}
 
     @classmethod
     def _to_Dict(cls, user, deref_all, *args, **kwargs):

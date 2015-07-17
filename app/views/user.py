@@ -2,6 +2,7 @@ import json
 from flask import request
 
 from app import mindme_api
+from config import fb_access_token_expire
 from lib import status as custom_status
 from resources import User
 
@@ -25,7 +26,7 @@ def user_get(user_id):
 def user_login():
     query_args = {
         'token': request.args.get('token', ''),
-        'expiration': request.args.get('expiration', ''),
+        'expiration': request.args.get('expiration', fb_access_token_expire),
         'fb_id': request.args.get('fb_id', ''),
         # TODO(ajen):
         #   1. Update user with real gcm id.
@@ -45,10 +46,13 @@ def user_login():
 
 @mindme_api.route('/api/v1/user/logout/', methods=['POST'])
 def user_logout():
-    token = request.args.get('token', '')
+    query_args = {
+        'token': request.args.get('token', ''),
+        'fb_id': request.args.get('fb_id', '')
+    }
 
     try:
-        user = User.logout(token)
+        user = User.logout(**query_args)
         result = custom_status.HTTPOk(result=user)
     except custom_status.CustomStatus as e:
         result = e
