@@ -4,12 +4,12 @@ USER = {
     'user1': {
         'id': 1,
         'fb_id': 'some_fb_id_1',
-        'gcm_id': 'some_gcm_id_1'
+        'gcm_id': 'some_gcm_id'
     },
     'user2': {
         'id': 2,
         'fb_id': 'some_fb_id_2',
-        'gcm_id': 'some_gcm_id_2'
+        'gcm_id': 'some_gcm_id'
     }
 }
 
