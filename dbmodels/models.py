@@ -84,8 +84,8 @@ class User(db.Model):
     """
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    fb_id = db.Column(db.String(64), nullable=False, index=True, unique=True)
-    gcm_id = db.Column(db.String(128), nullable=False, unique=True)
+    fb_id = db.Column(db.Text, nullable=False, index=True, unique=True)
+    gcm_id = db.Column(db.Text, nullable=False, unique=True)
 
     rcv_messages = db.relationship(
         'ReceivedMessage',
