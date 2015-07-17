@@ -1,5 +1,6 @@
 import json
 from flask import request
+from flask import jsonify
 
 from app import mindme_api
 from config import fb_access_token_expire
@@ -19,7 +20,11 @@ def user_get(user_id):
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp
 
 
 @mindme_api.route('/api/v1/user/login/', methods=['POST'])
@@ -41,7 +46,11 @@ def user_login():
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp
 
 
 @mindme_api.route('/api/v1/user/logout/', methods=['POST'])
@@ -59,4 +68,8 @@ def user_logout():
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp

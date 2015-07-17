@@ -1,5 +1,5 @@
-import json
 from flask import request
+from flask import jsonify
 
 from app import mindme_api
 from lib import status as custom_status
@@ -16,7 +16,11 @@ def reminder_get(reminder_id):
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp
 
 
 @mindme_api.route('/api/v1/reminder/create/', methods=['POST'])
@@ -35,7 +39,11 @@ def reminder_create():
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp
 
 
 @mindme_api.route('/api/v1/reminder/update/', methods=['POST'])
@@ -54,4 +62,8 @@ def reminder_update():
     except Exception:
         result = custom_status.InternalServerError()
 
-    return json.dumps(result.toDict())
+    result = result.toDict()
+    resp = jsonify(result)
+    resp.status_code = result['status']['statusCode']
+
+    return resp
