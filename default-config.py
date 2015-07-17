@@ -6,7 +6,6 @@ class BasicConfig(object):
 
 class APIDevConfig(BasicConfig):
     DEBUG = True
-    SERVER_NAME = 'localhost:5050'
 
 # TODO: Enable production in a bit.
 #
