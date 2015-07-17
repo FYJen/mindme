@@ -8,12 +8,18 @@ from lib import status as custom_status
 from resources import User
 
 
-@mindme_api.route('/api/v1/user/get/<int:user_id>/', methods=['GET'])
-def user_get(user_id):
+@mindme_api.route('/api/v1/user/get/<fb_id>/', methods=['GET'])
+def user_get(fb_id):
     """
     """
+    query_args = {
+        'fb_id': fb_id,
+        # Default message_type can be: 'sent', 'received' or 'all'.
+        'message_type': request.args.get('deref', 'all')
+    }
+
     try:
-        user = User.get(user_id)
+        user = User.get(**query_args)
         result = custom_status.HTTPOk(result=user)
     except custom_status.CustomStatus as e:
         result = e

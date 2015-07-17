@@ -10,16 +10,21 @@ class User(API_Base):
     """
     """
     @classmethod
-    def get(cls, user_id, deref_all=True):
+    def get(cls, fb_id=None, message_type=None, deref_all=True):
         """
         """
-        user_obj = models.User.query.get(user_id)
-        if not user_obj:
-            raise custome_status.ResourceNotFound(
-                details='No user found with the given id - %s' % user_id
+        if not all([fb_id, message_type]):
+            raise custome_status.InvalidRequest(
+                details='Bad request: Missing fb_id or message_type'
             )
 
-        return cls._to_Dict(user_obj, deref_all)
+        user_obj = models.User.query.filter_by(fb_id=fb_id).first()
+        if not user_obj:
+            raise custome_status.ResourceNotFound(
+                details='No user found with the given id - %s' % fb_id
+            )
+
+        return cls._to_Dict(user_obj, deref_all, message_type=message_type)
 
     @classmethod
     def _create(cls, fb_id, gcm_id):
@@ -82,7 +87,7 @@ class User(API_Base):
         return {}
 
     @classmethod
-    def _to_Dict(cls, user, deref_all, *args, **kwargs):
+    def _to_Dict(cls, user, deref_all, message_type=None):
         """
         """
         user_dict = {
@@ -90,7 +95,23 @@ class User(API_Base):
             'fb_id': user.fb_id
         }
 
-        if deref_all:
+        if message_type == 'sent':
+            user_dict.update({
+                'gcm_id': user.gcm_id,
+                'sent_messages': [
+                    Reminder._to_Dict(msg.message, deref_all)
+                    for msg in user.sent_messages
+                ]
+            })
+        elif message_type == 'received':
+            user_dict.update({
+                'gcm_id': user.gcm_id,
+                'received_messages': [
+                    Reminder._to_Dict(msg.message, deref_all)
+                    for msg in user.rcv_messages
+                ]
+            })
+        elif deref_all or message_type == 'all':
             user_dict.update({
                 'gcm_id': user.gcm_id,
                 'received_messages': [
