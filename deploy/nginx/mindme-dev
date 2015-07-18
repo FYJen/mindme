@@ -13,33 +13,12 @@
 ##
 
 server {
-    server_name arthur-jen.com;
-    return 301 $scheme://www.arthur-jen.com$request_uri;
-}
-
-server {
     listen 80 default_server;
     listen [::]:80 default_server ipv6only=on;
 
-    server_name www.arthur-jen.com;
-
-    location ^~ /static/ {
-        root /home/ubuntu/website/app;
-    }
-
-    location / {  
-        include        /etc/nginx/uwsgi_params;
-        uwsgi_pass     unix:/tmp/uwsgi_web.sock;
-
-        proxy_redirect     off;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Host $server_name;
-    }
+    server_name localhost;
 
     location /api/ {
-        #proxy_pass    http://127.0.0.1:5050;
         include        /etc/nginx/uwsgi_params;     
         uwsgi_pass     unix:/tmp/uwsgi_api.sock;    
         
