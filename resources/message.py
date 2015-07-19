@@ -183,8 +183,8 @@ class Reminder(API_Base):
         db.session.commit()
 
         # Sent notification.
-        assignee = message.rcv_user_mapping.assignee
-        author = message.sent_user_mapping.author
+        assignee = message_obj.rcv_user_mapping.assignee
+        author = message_obj.sent_user_mapping.author
         if assignee.fb_id != cur_user_id:
             gcm_send_wrapper(
                 assignee,
