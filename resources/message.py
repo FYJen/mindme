@@ -1,10 +1,16 @@
 from datetime import datetime
 
 from app import db
+from app import gcm_client
 from base import API_Base
 from config import time_format
 from dbmodels import models
+from gcm.gcm import GCMNotRegisteredException
+from gcm.gcm import GCMUnavailableException
 from lib import status as custome_status
+
+import json
+import urllib2
 
 
 def truncate_str(input_str, length=24, replace=' ...'):
@@ -13,6 +19,45 @@ def truncate_str(input_str, length=24, replace=' ...'):
         if len(input_str) > (length + replace_len) else input_str
 
     return truncated_str
+
+
+def gcm_send_wrapper(user, data):
+    # try:
+    #     canonical_id = gcm_client.plaintext_request(
+    #         registration_id=user.gcm_id,
+    #         data=data
+    #     )
+    #     if canonical_id:
+    #         # Replace reg_id with canonical_id in the database
+    #         user.gcm_id = canonical_id
+    #         db.session.commit()
+    # except GCMNotRegisteredException:
+    #     # Remove this reg_id from database
+    #     pass
+    # except GCMUnavailableException:
+    #     # Resent the message
+    #     pass
+    url = 'https://android.googleapis.com/gcm/send'
+    apiKey = 'AIzaSyCbnmuKVwsL1B-dGb5x4n_x-r-Q3VP0pI8'
+
+    headers = {
+        'content-type': 'application/json',
+        'authorization': 'key='+apiKey
+    }
+    fields = {
+        'registration_ids': [user.gcm_id],
+        'data': {
+            'id': data['id']
+        }
+    }
+
+    request = urllib2.Request(url, json.dumps(fields), headers)
+    resp_obj = urllib2.urlopen(request)
+    response = json.loads(resp_obj.read())
+
+    result = {}  # result sent back to client
+    result['statusCode'] = resp_obj.getcode()
+    result['results'] = response["results"]
 
 
 class Reminder(API_Base):
@@ -65,10 +110,11 @@ class Reminder(API_Base):
 
         # Create message.
         ACTIVE_STATUS = models.Status.query.filter_by(name='active').first()
+        created_time = datetime.now()
         message_obj = models.Message(
             message=message,
-            created_date=datetime.now(),
-            last_modified_date=datetime.now(),
+            created_date=created_time,
+            last_modified_date=created_time,
             status_id=ACTIVE_STATUS.id
         )
         db.session.add(message_obj)
@@ -91,6 +137,10 @@ class Reminder(API_Base):
         db.session.commit()
 
         # TODO(ajen): Add GCM integration.
+        gcm_send_wrapper(
+            assignee,
+            cls._to_Dict(message_obj, True, to_str=True)
+        )
 
         return cls._to_Dict(message_obj, deref_all)
 
@@ -136,11 +186,11 @@ class Reminder(API_Base):
         return cls._to_Dict(message_obj, deref_all)
 
     @classmethod
-    def _to_Dict(cls, message, deref_all, *args, **kwargs):
+    def _to_Dict(cls, message, deref_all, to_str=False, *args, **kwargs):
         """
         """
         reminder_dict = {
-            'id': message.id,
+            'id': str(message.id) if to_str else message.id,
             'message': message.message,
             'status': message.status.name,
             'created_date': message.created_date.strftime(time_format),

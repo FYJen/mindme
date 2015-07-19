@@ -1,6 +1,8 @@
 import os
 import redis
+from gcm import GCM
 
+from config import gcm_api_key
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -16,6 +18,9 @@ db = SQLAlchemy(mindme_api)
 
 # Redis store
 redis_store = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+# GCM client
+gcm_client = GCM(gcm_api_key)
 
 from app import views
 from dbmodels import models

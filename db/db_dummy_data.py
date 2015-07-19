@@ -9,7 +9,8 @@ USER = {
     'user2': {
         'id': 2,
         'fb_id': 'some_fb_id_2',
-        'gcm_id': 'some_gcm_id'
+        # 'gcm_id': 'some_gcm_id'
+        'gcm_id': 'f4g8243cGrQ:APA91bEeLvyH3ADvDEcVDD9bJFfDoS8VoHOV2qivFJMVLsJeod2Opg9NIfGZkf7v29i-Z62laxvgwaxmRNG1kT_ciMd68zGEYN8bUCdKP7T62JdW3CfK2w3pC2-zYgBUAKJxBlnutoYx'
     }
 }
 
