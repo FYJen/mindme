@@ -150,11 +150,12 @@ class Reminder(API_Base):
         message_id=None,
         new_status='',
         message='',
+        cur_user_id='',
         deref_all=False
     ):
         """
         """
-        if not all([message_id, any([message, new_status])]):
+        if not all([message_id, cur_user_id, any([message, new_status])]):
             raise custome_status.InvalidRequest(
                 details='Bad request: Missing message_id or new_status'
             )
@@ -181,7 +182,20 @@ class Reminder(API_Base):
         message_obj.last_modified_date = datetime.now()
         db.session.commit()
 
-        # TODO(ajen): Add GCM integration.
+        # Sent notification.
+        assignee = message.rcv_user_mapping.assignee
+        author = message.sent_user_mapping.author
+        if assignee.fb_id != cur_user_id:
+            gcm_send_wrapper(
+                assignee,
+                cls._to_Dict(message_obj, True, to_str=True)
+            )
+
+        if author.fb_id != cur_user_id:
+            gcm_send_wrapper(
+                author,
+                cls._to_Dict(message_obj, True, to_str=True)
+            )
 
         return cls._to_Dict(message_obj, deref_all)
 

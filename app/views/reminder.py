@@ -51,7 +51,8 @@ def reminder_update():
     query_args = {
         'message_id': request.args.get('message_id', None),
         'new_status': request.args.get('new_status', ''),
-        'message': request.args.get('message', '')
+        'message': request.args.get('message', ''),
+        'cur_user_id': request.args.get('cur_user_id', '')
     }
 
     try:
